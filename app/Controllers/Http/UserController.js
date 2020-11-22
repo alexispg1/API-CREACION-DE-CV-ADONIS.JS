@@ -1,6 +1,8 @@
 'use strict'
 
-const User=use('App/Models/User')
+const User=use('App/Models/User');
+const Mail = use('Mail');
+const Env = use('Env');
 
 class UserController {
     async index({response,request}){
@@ -92,7 +94,27 @@ class UserController {
         }
     }
 
-    async emailToRecoverAccount({request}){
+    async emailToRecoverAccount({request,response}){
+        const data=request.all();
+        const user=await User.findByOrFail('email',data.email);
+        if(user){
+            await Mail.send('emails.welcome', user.toJSON(), (message) => {
+                message
+                .to(user.email)
+                .from(Env.get('FROM_EMAIL'))
+                .subject('Recupera tu cuenta ')
+            })
+            let message={
+                'message':"email send"
+            }
+            return response.json(message,200);
+        }
+        else {
+            
+            return response.json({message:"user email not found"},404); 
+        }
+       
+    
 
     }
        

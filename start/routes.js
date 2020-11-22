@@ -27,10 +27,11 @@ Route.group(() => {
 
   Route.post('user/register','UserController.register')
   Route.post('user/login','UserController.login');
-
+  Route.post('user/sendEmail','UserController.emailToRecoverAccount');
+  
   Route.get('user/show','UserController.show').middleware(['auth']);
   Route.put('user/update','UserController.update').middleware(['auth']);
   Route.put('user/resetPassword/:id','UserController.resetPassword').middleware(['auth']);
   Route.delete('user/delete/:id','UserController.destroy').middleware(['auth']);
-
+  
 }).prefix('api/v1/');
