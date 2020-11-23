@@ -40,6 +40,14 @@ class UserController {
         }
     }
 
+    async logout({response,auth}){
+        const user = await auth.getUser();
+        const nose=await auth
+        .authenticator('jwt')
+        .revokeTokensForUser(user)
+        return response.json(nose,200);
+    }
+
     async show({response,auth}){
         const user =await auth.getUser();
         return response.json(user,200);
@@ -94,11 +102,18 @@ class UserController {
         }
     }
 
-    async emailToRecoverAccount({request,response}){
+    async emailToRecoverAccount({request,response,auth}){
         const data=request.all();
-        const user=await User.findByOrFail('email',data.email);
-        if(user){
-            await Mail.send('emails.welcome', user.toJSON(), (message) => {
+        try {
+            const user=await User.findByOrFail('email',data.email);
+            const token=await auth.generate(user);
+            const user_data={
+                'id':user.id,
+                'userName':user.userName,
+                'userLastName':user.userLastName,
+                'token':token.token,
+            };
+            await Mail.send('emails.welcome', user_data, (message) => {
                 message
                 .to(user.email)
                 .from(Env.get('FROM_EMAIL'))
@@ -106,16 +121,15 @@ class UserController {
             })
             let message={
                 'message':"email send"
-            }
+            }  
             return response.json(message,200);
+        }catch (error){
+            let exception={
+                'exception':"user not found 404",
+            }
+            return response.json(exception,404);  
         }
-        else {
-            
-            return response.json({message:"user email not found"},404); 
-        }
-       
-    
-
+        
     }
        
 }

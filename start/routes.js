@@ -27,6 +27,7 @@ Route.group(() => {
 
   Route.post('user/register','UserController.register')
   Route.post('user/login','UserController.login');
+  Route.get('user/logout','UserController.logout').middleware(['auth']);
   Route.post('user/sendEmail','UserController.emailToRecoverAccount');
   
   Route.get('user/show','UserController.show').middleware(['auth']);
