@@ -104,31 +104,28 @@ class UserController {
 
     async emailToRecoverAccount({request,response,auth}){
         const data=request.all();
-        try {
-            const user=await User.findByOrFail('email',data.email);
-            const token=await auth.generate(user);
-            const user_data={
+        console.log("data",data)
+    
+        const user=await User.findByOrFail('email',data.email);
+        const token=await auth.generate(user);
+        const user_data={
                 'id':user.id,
                 'userName':user.userName,
                 'userLastName':user.userLastName,
                 'token':token.token,
-            };
-            await Mail.send('emails.welcome', user_data, (message) => {
-                message
-                .to(user.email)
-                .from(Env.get('FROM_EMAIL'))
-                .subject('Recupera tu cuenta ')
-            })
-            let message={
-                'message':"email send"
-            }  
-            return response.json(message,200);
-        }catch (error){
-            let exception={
-                'exception':"user not found 404",
-            }
-            return response.json(exception,404);  
-        }
+        };
+        console.log(user_data);
+        await Mail.send('emails.welcome', user_data, (message) => {
+            message
+            .to(user.email)
+            .from(Env.get('FROM_EMAIL'))
+            .subject('Recupera tu cuenta ')
+        })
+        let message={
+            'message':"email send"
+        }  
+        return response.json(message,200);
+        
         
     }
        
